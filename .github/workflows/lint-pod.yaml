@@ -1,0 +1,17 @@
+name: Lint Pod
+
+on:
+  release:
+    types: [published, created, edited, prereleased, released]
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lint-pod: 
+    name: Lint Podspec
+    runs-on: macos-13
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Lint podspec using local source
+        working-directory: ./
+        run: pod lib lint --verbose --allow-warnings

@@ -1,0 +1,2 @@
+# Why is every file conditionally-compiled?
+While shipping with SPM makes conditionally-including dependencies easy in `Package.swift`, CocoaPods users don't have it as easy. In order to make this library conveniently ship the `#PredicateBuilder` macro only when Swift 5.9 is available, the whole modile is conditionally-compiled. This removes the burden of detecting the supported langauge version and changing the Podfile accordingly from consumers of this pod.
