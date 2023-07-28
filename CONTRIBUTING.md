@@ -17,10 +17,13 @@ Contributions from the open-source community are crucial in helping us meet make
 
 ### Suggesting Enhancements 
 - Open an issue clearly describing the behavior you would like to see. 
-- If applicable, provide a few examples of how the feature would work and what purpose it would serve.
+- If applicable, provide a few examples of how tshe feature would work and what purpose it would serve.
 - Tag the issue with the `enhancement` label.
 
 ### Contributing Code by Opening a Pull Request
+Before code can be accepted all contributors must complete our
+[Individual Contributor License Agreement (CLA)](https://spreadsheets.google.com/spreadsheet/viewform?formkey=dDViT2xzUHAwRkI3X3k5Z0lQM091OGc6MQ&ndplr=1).
+
 Please fork the GitHub repo and submit a pull request to the `main` branch. 
 
 Our code owners will review your work and merge once any issues have been addressed. If the PR gets too outdated we may ask you to rebase and force push to update the PR.s
