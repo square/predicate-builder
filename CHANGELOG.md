@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 <!--Latest Release-->
+## [1.0.1] - 09-19-2023
+
+### Fixed
+- Removed a crash on comparison of an Optional key path to `nil`
+
 ## [1.0.0] - 07-19-2023
 
 ### Added
