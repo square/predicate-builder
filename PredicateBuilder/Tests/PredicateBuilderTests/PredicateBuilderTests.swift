@@ -111,4 +111,15 @@ final class PredicateBuilderTests: XCTestCase {
             #"cost > 0 AND cost > 1 AND cost > 2 AND (isReal == 1 OR name == "test")"#
         )
     }
+    
+    func test_givenBuilder_whenComparisonIsToNil_thenBuilderBridgesNilToPredicateString() {
+        @PredicateBuilder<Spaceship> var predicate: NSPredicate {
+            Or {
+                \Spaceship.fleetMembers == nil
+                \Spaceship.fleetMembers != nil
+            }
+        }
+        
+        XCTAssertEqual(predicate.predicateFormat, "fleetMembers == nil OR fleetMembers != nil")
+    }
 }
