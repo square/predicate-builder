@@ -6,14 +6,14 @@ import CoreData
 public extension KeyPath where Root: NSManagedObject, Value: Equatable {
     static func == (
         keyPath: KeyPath<Root, Value>,
-        value: Value
+        value: Value?
     ) -> ComparisonPredicate<Root, Value> {
         compare(keyPath, value, using: .equalTo)
     }
     
     static func != (
         keyPath: KeyPath<Root, Value>,
-        value: Value
+        value: Value?
     ) -> ComparisonPredicate<Root, Value> {
         compare(keyPath, value, using: .notEqualTo)
     }
@@ -51,7 +51,7 @@ public extension KeyPath where Root: NSManagedObject, Value: Comparable {
 
 private func compare<Value, Root, KeyPathType>(
     _ keyPath: KeyPathType,
-    _ value: Value,
+    _ value: Value?,
     using comparisonOperator: NSComparisonPredicate.Operator
 ) -> ComparisonPredicate<Root, Value> where Root: NSManagedObject, KeyPathType: KeyPath<Root, Value> {
     ComparisonPredicate(keyPath, comparisonOperator, value, options: [])
