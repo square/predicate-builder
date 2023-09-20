@@ -59,4 +59,26 @@ final class OperatorTests: XCTestCase {
         let predicate = !(\Spaceship.cost > 0)
         XCTAssertEqual(predicate.predicateFormat, "NOT cost > 0")
     }
+    
+    // MARK: - Comparison to nil
+    
+    func test_givenOperator_whenKeyPathValueIsOptional_thenPredicateExpressionIsValid() {
+        @PredicateBuilder<Spaceship> var predicate: NSPredicate {
+            \Spaceship.fleetMembers == nil
+            \Spaceship.fleetMembers != nil
+        }
+        
+        XCTAssertEqual(predicate.predicateFormat, "fleetMembers == nil AND fleetMembers != nil")
+    }
+    
+    // This case is distinct to the one above due to the way Foundation's format
+    // string parser represents "nil" and an `Any?` holding an `Optional<Wrapped>.none`
+    func test_givenBuilder_whenComparisonIsToOptionalNone_thenBuilderBridgesNilToPredicateString() {
+        let nilShips: Set<Spaceship>? = nil
+        @PredicateBuilder<Spaceship> var predicate: NSPredicate {
+            \Spaceship.fleetMembers == nilShips
+            \Spaceship.fleetMembers != nilShips
+        }
+        XCTAssertEqual(predicate.predicateFormat, "fleetMembers == nil AND fleetMembers != nil")
+    }
 }
