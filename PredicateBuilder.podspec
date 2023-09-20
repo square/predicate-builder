@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/square/predicate-builder'
   s.license      = { :type => 'Apache 2.0', :text => '2023 Square, Inc.' }
   s.author       = { "Patrick Gatewood" => "patrick@patrickgatewood.com" }
-  s.source = { :git => 'org-49461806@github.com:square/predicate-builder.git', :tag => "#{ s.version.to_s }" }
+  s.source = { :git => 'https://github.com/square/predicate-builder.git', :tag => s.version }
   s.ios.deployment_target = '14.0'
   s.osx.deployment_target = '12.0'
 
