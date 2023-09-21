@@ -77,26 +77,19 @@ public final class ComparisonPredicate<RootType: NSManagedObject, Value>: NSComp
     ///
     /// You should not form predicates using this method directly.
     /// Use the [`@PredicateBuilder`](x-source-tag://PredicateBuilder) result builder instead.
-    public init(
+    public convenience init(
         _ keyPath: KeyPath<Root, Value>,
         _ comparisonOperator: NSComparisonPredicate.Operator,
         _ value: Any?,
         modifier: NSComparisonPredicate.Modifier = .direct,
         options: ComparisonPredicateOptions = []
     ) {
-        self.keyPath = .nonOptional(keyPath)
-        self.comparisonOperator = comparisonOperator
-        self.value = value
-        self.modifier = modifier
-        
-        let leftExpression = \Root.self == keyPath ? NSExpression.expressionForEvaluatedObject() : NSExpression(forKeyPath: keyPath)
-        let rightExpression = NSExpression(forConstantValue: value)
-        super.init(
-            leftExpression: leftExpression,
-            rightExpression: rightExpression,
+        self.init(
+            keyPath: .nonOptional(keyPath),
+            comparisonOperator: comparisonOperator,
+            value: value,
             modifier: modifier,
-            type: comparisonOperator,
-            options: Options(rawValue: options.rawValue)
+            options: options
         )
     }
     
@@ -105,20 +98,59 @@ public final class ComparisonPredicate<RootType: NSManagedObject, Value>: NSComp
     ///
     /// You should not form predicates using this method directly.
     /// Use the [`@PredicateBuilder`](x-source-tag://PredicateBuilder) result builder instead.
-    public init(
-        _ keyPath: KeyPath<Root, Value?>,
+    public convenience init(
+        keyPath: KeyPath<Root, Value?>,
         _ comparisonOperator: NSComparisonPredicate.Operator,
         _ value: Any?,
         modifier: NSComparisonPredicate.Modifier = .direct,
         options: ComparisonPredicateOptions = []
     ) {
-        self.keyPath = .optional(keyPath)
+        self.init(
+            keyPath: .optional(keyPath),
+            comparisonOperator: comparisonOperator,
+            value: value,
+            modifier: modifier,
+            options: options
+        )
+    }
+    
+    private init(
+        keyPath: KeyPathType,
+        comparisonOperator: NSComparisonPredicate.Operator,
+        value: Any?,
+        modifier: NSComparisonPredicate.Modifier = .direct,
+        options: ComparisonPredicateOptions = []
+    ) {
+        self.keyPath = keyPath
         self.comparisonOperator = comparisonOperator
         self.value = value
         self.modifier = modifier
         
-        let leftExpression = \Root.self == keyPath ? NSExpression.expressionForEvaluatedObject() : NSExpression(forKeyPath: keyPath)
-        let rightExpression = NSExpression(forConstantValue: value)
+        let leftExpression: NSExpression
+        switch keyPath {
+        case .optional(let keyPathToOptionalValue):
+            leftExpression = \Root.self == keyPathToOptionalValue
+            ? NSExpression.expressionForEvaluatedObject()
+            : NSExpression(forKeyPath: keyPathToOptionalValue)
+        case .nonOptional(let keyPathToNonOptionalValue):
+            leftExpression = \Root.self == keyPathToNonOptionalValue
+            ? NSExpression.expressionForEvaluatedObject()
+            : NSExpression(forKeyPath: keyPathToNonOptionalValue)
+        }
+        
+        var rightExpression = NSExpression(forConstantValue: value)
+        if rightExpression.constantValue == nil || rightExpression.constantValue is NSNull  {
+            // For some reason, NSExpression(forConstantValue:) interprets Swift's
+            // `nil` properly in the expression language, but bridges an `Any?` holding
+            // Optional<Wrapped>.none to `NSNull`, which is represented as "<null>"
+            // in the format string.
+            //
+            // Apparently, "<null>" is not a valid format string in the predicate
+            // expression language. Here, we normalize the `NSNull` representation
+            // to one which the predicate format string parser can understand.
+            rightExpression = NSExpression(format: "nil")
+        }
+        
         super.init(
             leftExpression: leftExpression,
             rightExpression: rightExpression,
@@ -132,24 +164,13 @@ public final class ComparisonPredicate<RootType: NSManagedObject, Value>: NSComp
     ///
     /// - returns: a `ComparisonPredicate` with the comparison options set to the value you supply.
     public func withOptions(_ options: ComparisonPredicateOptions) -> ComparisonPredicate<Root, Value> {
-        switch self.keyPath {
-        case .optional(let keyPath):
-            return ComparisonPredicate(
-                keyPath,
-                comparisonOperator,
-                value,
-                modifier: modifier,
-                options: options
-            )
-        case .nonOptional(let keyPath):
-            return ComparisonPredicate(
-                keyPath,
-                comparisonOperator,
-                value,
-                modifier: modifier,
-                options: options
-            )
-        }
+        ComparisonPredicate(
+            keyPath: keyPath,
+            comparisonOperator: comparisonOperator,
+            value: value,
+            modifier: modifier,
+            options: options
+        )
     }
     
     @available(*, unavailable, message: "init(coder:) has not been implemented")
