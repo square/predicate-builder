@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 <!--Latest Release-->
+## [1.0.2] - 09-22-2023
+
+### Fixed
+- Fixed representation of optional comparison values in the resulting format string. Optionals will now correctly be represented as `"nil"` instead of `<null>`
+
 ## [1.0.1] - 09-19-2023
 
 ### Fixed
