@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   # Core name/version/soure info
   s.name         = 'PredicateBuilder'
-  s.version      = '1.0.1'
+  s.version      = '1.0.2'
 
   # Required podspec metadata
   s.summary      = 'A declarative, type-safe way to build NSPredicates'
