@@ -1,4 +1,6 @@
 name: Build And Test PredicateBuilder
+permissions:
+  contents: read
 
 on:
   push: 
