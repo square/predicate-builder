@@ -8,12 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 <!--Latest Release-->
-## [1.0.3] - 11-28-2025
-
-### Fixed
-- Fix SPM package resolution
-- Bundle macro with Swift package
-
 ## [1.0.2] - 09-22-2023
 
 ### Fixed
