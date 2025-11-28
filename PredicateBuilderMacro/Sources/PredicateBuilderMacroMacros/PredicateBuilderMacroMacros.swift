@@ -39,17 +39,18 @@ public struct PredicateBuilderMacro: ExpressionMacro {
     ) throws -> ExprSyntax {
         guard let genericArguments = node.genericArguments,
               let genericType = genericArguments.arguments.first else {
-            let noSpecializationError = Diagnostic(
-                node: Syntax(node),
-                message: PredicateBuilderMacroDiagnostic.noSpecialization
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(node),
+                    message: PredicateBuilderMacroDiagnostic.noSpecialization
+                )
             )
-            context.diagnose(noSpecializationError)
             return ""
         }
-        
+
         // Diagnostics are not needed for too many specializations because the
         // type system catches that error when the macro expands
-        
+
         let buildBlockBody: CodeBlockItemListSyntax =
             if let statements = node.trailingClosure?.statements {
                 statements
@@ -58,18 +59,22 @@ public struct PredicateBuilderMacro: ExpressionMacro {
                 // already correctly handles empty bodies
                 CodeBlockItemListSyntax([])
             }
-        
+
         // I'm not sure why `buildBlockBody` comes with the leading trivia "\n",
         // but we trim it here so that the expansion looks better to our fellow debuggers.
         let trimmedBody = buildBlockBody.trimmed
-        return """
-        {
-            @PredicateBuilder<\(genericType)> var predicate: AnyTypedPredicate<\(genericType)> {
-                \(trimmedBody)
-            }
-            return predicate
-        }()
-        """
+        let genericTypeTrimmed = genericType.trimmed
+
+        return ExprSyntax(
+            stringLiteral: """
+            {
+                @PredicateBuilder<\(genericTypeTrimmed.description)> var predicate: AnyTypedPredicate<\(genericTypeTrimmed.description)> {
+                    \(trimmedBody.description)
+                }
+                return predicate
+            }()
+            """
+        )
     }
 }
 #endif
