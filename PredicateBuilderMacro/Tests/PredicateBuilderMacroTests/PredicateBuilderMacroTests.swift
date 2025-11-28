@@ -20,7 +20,7 @@ final class PredicateBuilderMacroTests: XCTestCase {
             expandedSource:
             #"""
             {
-                @PredicateBuilder<Spaceship> var predicate: AnyTypedPredicate<Spaceship> {
+                var predicate: AnyTypedPredicate<Spaceship> {
                     \Spaceship.isReal
                 }
                 return predicate

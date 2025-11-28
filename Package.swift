@@ -1,7 +1,8 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import CompilerPluginSupport
 
 let package = Package(
     name: "PredicateBuilder",
@@ -20,60 +21,87 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "PredicateBuilderCore"),
-        .package(path: "PredicateBuilderTestData")
-    ].withMacroDependencyIfPossible(),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1")
+    ],
     targets: [
+        .target(
+            name: "PredicateBuilderCore",
+            path: "PredicateBuilderCore/Sources/PredicateBuilderCore"
+        ),
         .target(
             name: "PredicateBuilder",
             dependencies: [
-                .product(name: "PredicateBuilderCore", package: "PredicateBuilderCore")
-            ].withMacroDependencyIfPossible(),
+                .target(name: "PredicateBuilderCore"),
+                .target(name: "PredicateBuilderMacro")
+            ],
             path: "PredicateBuilder/Sources"
+        ),
+        .macro(
+            name: "PredicateBuilderMacroMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+                .target(name: "PredicateBuilderCore")
+            ],
+            path: "PredicateBuilderMacro/Sources/PredicateBuilderMacroMacros"
+        ),
+        .target(
+            name: "PredicateBuilderMacro",
+            dependencies: [
+                .target(name: "PredicateBuilderCore"),
+                "PredicateBuilderMacroMacros"
+            ],
+            path: "PredicateBuilderMacro/Sources/PredicateBuilderMacro"
+        ),
+        .target(
+            name: "PredicateBuilderTestData",
+            path: "PredicateBuilderTestData/Sources/PredicateBuilderTestData"
         ),
         .executableTarget(
             name: "PredicateBuilderExample",
             dependencies: [
                 .target(name: "PredicateBuilder"),
-                .product(name: "PredicateBuilderTestData", package: "PredicateBuilderTestData")
-            ].withMacroDependencyIfPossible(),
+                .target(name: "PredicateBuilderTestData")
+            ],
             path: "PredicateBuilderExample"
+        ),
+        .executableTarget(
+            name: "PredicateBuilderMacroClient",
+            dependencies: [
+                .target(name: "PredicateBuilderMacro"),
+                .target(name: "PredicateBuilderTestData")
+            ],
+            path: "PredicateBuilderMacro/PredicateBuilderMacroClient"
         ),
         .testTarget(
             name: "PredicateBuilderTests",
             dependencies: [
                 .target(name: "PredicateBuilder"),
-                .product(name: "PredicateBuilderTestData", package: "PredicateBuilderTestData")
-            ].withMacroDependencyIfPossible(),
+                .target(name: "PredicateBuilderTestData")
+            ],
             path: "PredicateBuilder/Tests"
+        ),
+        .testTarget(
+            name: "PredicateBuilderCoreTests",
+            dependencies: [
+                .target(name: "PredicateBuilderCore")
+            ],
+            path: "PredicateBuilderCore/Tests/PredicateBuilderCoreTests"
+        ),
+        .testTarget(
+            name: "PredicateBuilderMacroTests",
+            dependencies: [
+                "PredicateBuilderMacroMacros",
+                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+            ],
+            path: "PredicateBuilderMacro/Tests/PredicateBuilderMacroTests"
+        ),
+        .testTarget(
+            name: "PredicateBuilderTestDataTests",
+            dependencies: [
+                .target(name: "PredicateBuilderTestData")
+            ],
+            path: "PredicateBuilderTestData/Tests/PredicateBuilderTestDataTests"
         ),
     ]
 )
-
-extension Array where Element == Target.Dependency {
-    func withMacroDependencyIfPossible() -> Self {
-#if(swift(<5.9))
-        return self
-#else
-        var array = self
-        array.append(
-            .product(name: "PredicateBuilderMacro", package: "PredicateBuilderMacro")
-        )
-        return array
-#endif
-    }
-}
-
-extension Array where Element == Package.Dependency {
-    func withMacroDependencyIfPossible() -> Self {
-#if(swift(<5.9))
-        return self
-#else
-        var array = self
-        array.append(
-            .package(path: "PredicateBuilderMacro")
-        )
-        return array
-#endif
-    }
-}

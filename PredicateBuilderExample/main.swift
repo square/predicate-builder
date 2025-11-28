@@ -1,6 +1,5 @@
 import CoreData
 import PredicateBuilder
-import PredicateBuilderCore
 import PredicateBuilderTestData
 
 // A bunch of predicate examples. 
@@ -166,8 +165,6 @@ logResults(for: anyPredicate)
 // MARK: - Swift 5.9 playground
 
 #if swift(>=5.9)
-import PredicateBuilderMacro
-
 if #available(macOS 14.0, iOS 17.0, *) {
     
     // MARK: Trouble with #Predicate macro
